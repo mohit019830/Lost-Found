@@ -64,15 +64,35 @@ app.get("/api/items/:id",(req,res)=>{
 })
 
 //4 PUT /api/items/:id — Edit a report
-// app.put("/api/items/:id",(req,res)=>{
-//     try{
-//         const {id,itemName,type,place,date,contact}=req.body
-//         if(!id || !itemName || !type || !place || !date || !contact){
-//             res.status(400).send("Invalid body")
-//         }
-//     }catch(err){
-//         console.log(err)
-//     }
-// })
+app.put("/api/items/:id",(req,res)=>{
+    try{
+        let id1=req.params.id
+        const {id,itemName,type,place,date,contact}=req.body
+        if(!id || !itemName || !type || !place || !date || !contact){
+            res.status(400).send("Invalid body")
+        }
+        const data=fs.readFileSync(filePath,"utf-8")
+        const data1=JSON.parse(data)
+        const index=data1.findIndex(obj=>obj.id===id1)
+        if(index==-1){
+            res.status(404).send("No such id")
+        }
+        let obj={
+            "id":data1[index].id,
+            "itemName":itemName,
+            "type":type,
+            "place":place,
+            "date":date,
+            "contact":contact,
+            "status":data1[index].status
+        }
+        data1[index]=obj
+        fs.writeFileSync(filePath,JSON.stringify(data1))
+        res.status(200).json(obj)
+    }catch(err){
+        console.log(err)
+        res.send("Error")
+    }
+})
 
 app.listen(3000)
