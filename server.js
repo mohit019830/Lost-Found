@@ -95,4 +95,26 @@ app.put("/api/items/:id",(req,res)=>{
     }
 })
 
+// 5 PATCH /api/items/:id/claim — Mark as claimed
+app.patch("/api/items/:id/claim",(req,res)=>{
+    try{
+        let id=req.params.id
+        const data=fs.readFileSync(filePath,"utf-8")
+        const data1=JSON.parse(data)
+        const index=data1.findIndex(obj=>obj.id===id)
+        if(index==-1){
+            res.status(404).send("No such id")
+        }
+        if(data1[index].status==="claimed"){
+            res.status(409).json({ "error": "Item Already Claimed"})
+        }
+        data1[index].status="claimed"
+        fs.writeFileSync(filePath,JSON.stringify(data1))
+        res.status(200).json(data1[index])
+    }catch(err){
+        console.log(err)
+        res.send("Error")
+    }
+})
+
 app.listen(3000)
